@@ -10,6 +10,7 @@ package org.badge.applet;
 import java.applet.Applet;
 import java.awt.*;
 import java.util.*;
+import netscape.javascript.JSObject;
 
 import javax.swing.JOptionPane;
 
@@ -29,7 +30,8 @@ public class BadgeApplet extends Applet{
 	Map<String, Integer> fonts = new HashMap();
 	ArrayList<String> errors = new ArrayList();
 	Font f;
-	
+	protected static JSObject appletWindowJSObject = null;
+        
 	public void init(){
 		
 		colors.put("blue", Color.blue);
@@ -75,26 +77,22 @@ public class BadgeApplet extends Applet{
 		}
 		if(name==null){
 			name="Hello";
-			showStatus("Name parameter not entered");
-			errors.add("Name parameter not entered");
+			errors.add("Name parameter not entered - Default used");
 		}
 		
 		if(shape==null){
 			shape="RECT";
-			showStatus("Shape parameter not entered");
-			errors.add("Shape parameter not entered");
+			errors.add("Shape parameter not entered - Default used");
 		}
 		
 		if(colorString==null){
 			colorString="cyan";
-			showStatus("Color parameter not entered");
-			errors.add("Color parameter not entered");
+			errors.add("Color parameter not entered - Default used");
 		}
 		
 		if(stringY==null){
 			y = 30;
-			showStatus("Y parameter not entered");
-			errors.add("Y parameter not entered");
+			errors.add("Y parameter not entered - Default used");
 		}
 		else{
 			y = Integer.parseInt(stringY);
@@ -102,8 +100,7 @@ public class BadgeApplet extends Applet{
 		
 		if(stringX==null){
 			x = 100;
-			showStatus("X parameter not entered");
-			errors.add("X parameter not entered");
+			errors.add("X parameter not entered - Default used");
 		}
 		else{
 			x = Integer.parseInt(stringX);
@@ -111,21 +108,18 @@ public class BadgeApplet extends Applet{
 		
 		if(ftstyle==null){
 			ftstyle = "BOLD";
-			showStatus("ftstyle parameter not entered");
-			errors.add("ftstyle parameter not entered");
+			errors.add("ftstyle parameter not entered - Default used");
 		}
 		
 		if(ftsizeString==null){
 			ftsize = 20;
-			showStatus("ftsize parameter not entered");
-			errors.add("ftsize parameter not entered");
+			errors.add("ftsize parameter not entered - Default used");
 		}
 		else{
 			ftsize = Integer.parseInt(ftsizeString);
 		}
 		
 		if(!bgColorSet){
-			showStatus("background color not entered");
 			errors.add("bgcolor parameter not entered or not valid");
 		}
 		
@@ -160,13 +154,19 @@ public class BadgeApplet extends Applet{
 		if(fm.stringWidth(name)>x || (fm.getAscent())>y){
 			errors.add("Text is too big!!");
 		}
+                
+
+                appletWindowJSObject = JSObject.getWindow(this);
+
 		
 		if(errors.size()>0){
 			String errorString = "";
 			for(String s: errors){
 				errorString += s+"\n";
 			}
-			JOptionPane.showMessageDialog(null, errorString);
+                        String[] l = new String[1];
+                        l[0] = errorString;
+			appletWindowJSObject.call("setError", l);
 		}
 
 		
